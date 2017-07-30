@@ -18,7 +18,6 @@ namespace NzbDrone.Core.Test.Messaging.Commands
         private BlockingCollection<CommandModel> _commandQueue;
         private Mock<IExecute<CommandA>> _executorA;
         private Mock<IExecute<CommandB>> _executorB;
-        private bool _commandExecuted = false;
 
         [SetUp]
         public void Setup()
@@ -35,6 +34,12 @@ namespace NzbDrone.Core.Test.Messaging.Commands
                   .Returns(_executorB.Object);
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            Subject.Handle(new ApplicationShutdownRequested());
+        }
+
         private void GivenCommandQueue()
         {
             _commandQueue = new BlockingCollection<CommandModel>(new CommandQueue());
@@ -46,20 +51,20 @@ namespace NzbDrone.Core.Test.Messaging.Commands
 
         private void WaitForExecution(CommandModel commandModel)
         {
+            var commandExecuted = false;
+
             Mocker.GetMock<IManageCommandQueue>()
                   .Setup(s => s.Complete(It.Is<CommandModel>(c => c == commandModel), It.IsAny<string>()))
-                  .Callback(() => _commandExecuted = true);
+                  .Callback(() => commandExecuted = true);
 
             Mocker.GetMock<IManageCommandQueue>()
                   .Setup(s => s.Fail(It.Is<CommandModel>(c => c == commandModel), It.IsAny<string>(), It.IsAny<Exception>()))
-                  .Callback(() => _commandExecuted = true);
+                  .Callback(() => commandExecuted = true);
 
-            while (!_commandExecuted)
+            while (!commandExecuted)
             {
                 Thread.Sleep(100);
             }
-
-            var t1 = 1;
         }
 
         [Test]
@@ -164,18 +169,18 @@ namespace NzbDrone.Core.Test.Messaging.Commands
             WaitForExecution(commandModel);
 
             Mocker.GetMock<IManageCommandQueue>()
-                  .Setup(s => s.Complete(It.Is<CommandModel>(c => c == commandModel), commandA.CompletionMessage))
-                  .Callback(() => _commandExecuted = true);
+                  .Verify(s => s.Complete(It.Is<CommandModel>(c => c == commandModel), commandA.CompletionMessage), Times.Once());
         }
 
         [Test]
         public void should_use_last_progress_message_if_completion_message_is_null()
         {
             GivenCommandQueue();
-            var commandA = new CommandA();
+            var commandB = new CommandB();
+
             var commandModel = new CommandModel
             {
-                Body = commandA,
+                Body = commandB,
                 Message = "Do work"
             };
 
@@ -185,8 +190,7 @@ namespace NzbDrone.Core.Test.Messaging.Commands
             WaitForExecution(commandModel);
 
             Mocker.GetMock<IManageCommandQueue>()
-                  .Setup(s => s.Complete(It.Is<CommandModel>(c => c == commandModel), commandModel.Message))
-                  .Callback(() => _commandExecuted = true);
+                  .Verify(s => s.Complete(It.Is<CommandModel>(c => c == commandModel), commandModel.Message), Times.Once());
         }
     }
 
