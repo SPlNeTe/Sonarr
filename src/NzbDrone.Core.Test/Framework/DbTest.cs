@@ -127,9 +127,9 @@ namespace NzbDrone.Core.Test.Framework
                     {
                         File.Delete(file);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
-                        TestLogger.Trace("Failed to delete file from temp folder: {0}", file);
+
                     }
                 }
             }

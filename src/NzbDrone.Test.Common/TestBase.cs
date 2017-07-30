@@ -83,7 +83,7 @@ namespace NzbDrone.Test.Common
             get
             {
                 var virtualPath = Path.Combine(TempFolder, "VirtualNzbDrone");
-                Directory.CreateDirectory(virtualPath);
+                if (!Directory.Exists(virtualPath)) Directory.CreateDirectory(virtualPath);
 
                 return virtualPath;
             }
@@ -123,9 +123,8 @@ namespace NzbDrone.Test.Common
                     tempFolder.Delete(true);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                TestLogger.Trace("Failed to delete temp folder: {0}", TempFolder);
             }
         }
 
@@ -150,8 +149,8 @@ namespace NzbDrone.Test.Common
         protected void WithTempAsAppPath()
         {
             Mocker.GetMock<IAppFolderInfo>()
-                  .SetupGet(c => c.AppDataFolder)
-                  .Returns(VirtualPath);
+                .SetupGet(c => c.AppDataFolder)
+                .Returns(VirtualPath);
 
             TestFolderInfo = Mocker.GetMock<IAppFolderInfo>().Object;
         }
