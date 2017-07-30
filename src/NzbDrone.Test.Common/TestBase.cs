@@ -15,14 +15,12 @@ namespace NzbDrone.Test.Common
 {
     public abstract class TestBase<TSubject> : TestBase where TSubject : class
     {
-
         private TSubject _subject;
 
         [SetUp]
         public void CoreTestSetup()
         {
             _subject = null;
-
         }
 
         protected TSubject Subject
@@ -36,14 +34,12 @@ namespace NzbDrone.Test.Common
 
                 return _subject;
             }
-
         }
-
     }
 
     public abstract class TestBase : LoggingTest
     {
-
+        private static int safeInstanceCount = 0;
         private static readonly Random _random = new Random();
 
         private AutoMoqer _mocker;
@@ -63,13 +59,22 @@ namespace NzbDrone.Test.Common
             }
         }
 
-
         protected int RandomNumber
         {
             get
             {
                 Thread.Sleep(1);
                 return _random.Next(0, int.MaxValue);
+            }
+        }
+
+        protected int UniqueNumber
+        {
+            get
+            {
+                Interlocked.Increment(ref safeInstanceCount);
+
+                return safeInstanceCount;
             }
         }
 
@@ -93,7 +98,7 @@ namespace NzbDrone.Test.Common
 
             LogManager.ReconfigExistingLoggers();
 
-            TempFolder = Path.Combine(TestContext.CurrentContext.TestDirectory, "_temp_" + DateTime.Now.Ticks);
+            TempFolder = Path.Combine(TestContext.CurrentContext.TestDirectory, "_temp_" + UniqueNumber);
 
             Directory.CreateDirectory(TempFolder);
         }
