@@ -98,7 +98,7 @@ namespace NzbDrone.Test.Common
 
             LogManager.ReconfigExistingLoggers();
 
-            TempFolder = Path.Combine(TestContext.CurrentContext.TestDirectory, "_temp_" + UniqueNumber);
+            TempFolder = Path.Combine(TestContext.CurrentContext.TestDirectory, $"_temp_{DateTime.Now.Ticks}_{UniqueNumber}");
 
             TestLogger.Trace("Creating Temp Folder: {0}", TempFolder);
             Directory.CreateDirectory(TempFolder);
