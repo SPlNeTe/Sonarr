@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Moq;
 using NUnit.Framework;
@@ -18,12 +19,15 @@ namespace NzbDrone.Core.Test.Messaging.Commands
         private BlockingCollection<CommandModel> _commandQueue;
         private Mock<IExecute<CommandA>> _executorA;
         private Mock<IExecute<CommandB>> _executorB;
+        private List<CommandModel> _executedCommands;
 
         [SetUp]
         public void Setup()
         {
             _executorA = new Mock<IExecute<CommandA>>();
             _executorB = new Mock<IExecute<CommandB>>();
+            _commandQueue = new BlockingCollection<CommandModel>(new CommandQueue());
+            _executedCommands = new List<CommandModel>();
 
             Mocker.GetMock<IServiceFactory>()
                   .Setup(c => c.Build(typeof(IExecute<CommandA>)))
@@ -32,6 +36,18 @@ namespace NzbDrone.Core.Test.Messaging.Commands
             Mocker.GetMock<IServiceFactory>()
                   .Setup(c => c.Build(typeof(IExecute<CommandB>)))
                   .Returns(_executorB.Object);
+
+            Mocker.GetMock<IManageCommandQueue>()
+                  .Setup(s => s.Queue(It.IsAny<CancellationToken>()))
+                  .Returns(_commandQueue.GetConsumingEnumerable);
+
+            Mocker.GetMock<IManageCommandQueue>()
+                  .Setup(s => s.Complete(It.IsAny<CommandModel>(), It.IsAny<string>()))
+                  .Callback<CommandModel, string>((command, completionMessage) => _executedCommands.Add(command));
+
+            Mocker.GetMock<IManageCommandQueue>()
+                  .Setup(s => s.Fail(It.IsAny<CommandModel>(), It.IsAny<string>(), It.IsAny<Exception>()))
+                  .Callback<CommandModel, string, Exception>((command, completionMessage, exception) => _executedCommands.Add(command));
         }
 
         [TearDown]
@@ -40,28 +56,9 @@ namespace NzbDrone.Core.Test.Messaging.Commands
             Subject.Handle(new ApplicationShutdownRequested());
         }
 
-        private void GivenCommandQueue()
-        {
-            _commandQueue = new BlockingCollection<CommandModel>(new CommandQueue());
-
-            Mocker.GetMock<IManageCommandQueue>()
-                  .Setup(s => s.Queue(It.IsAny<CancellationToken>()))
-                  .Returns(_commandQueue.GetConsumingEnumerable);
-        }
-
         private void WaitForExecution(CommandModel commandModel)
         {
-            var commandExecuted = false;
-
-            Mocker.GetMock<IManageCommandQueue>()
-                  .Setup(s => s.Complete(It.Is<CommandModel>(c => c == commandModel), It.IsAny<string>()))
-                  .Callback(() => commandExecuted = true);
-
-            Mocker.GetMock<IManageCommandQueue>()
-                  .Setup(s => s.Fail(It.Is<CommandModel>(c => c == commandModel), It.IsAny<string>(), It.IsAny<Exception>()))
-                  .Callback(() => commandExecuted = true);
-
-            while (!commandExecuted)
+            while (!_executedCommands.Any(c => c == commandModel))
             {
                 Thread.Sleep(100);
             }
@@ -79,7 +76,6 @@ namespace NzbDrone.Core.Test.Messaging.Commands
         [Test]
         public void should_execute_on_executor()
         {
-            GivenCommandQueue();
             var commandA = new CommandA();
             var commandModel = new CommandModel
                                {
@@ -97,7 +93,6 @@ namespace NzbDrone.Core.Test.Messaging.Commands
         [Test]
         public void should_not_execute_on_incompatible_executor()
         {
-            GivenCommandQueue();
             var commandA = new CommandA();
             var commandModel = new CommandModel
             {
@@ -116,7 +111,6 @@ namespace NzbDrone.Core.Test.Messaging.Commands
         [Test]
         public void broken_executor_should_publish_executed_event()
         {
-            GivenCommandQueue();
             var commandA = new CommandA();
             var commandModel = new CommandModel
             {
@@ -138,7 +132,6 @@ namespace NzbDrone.Core.Test.Messaging.Commands
         [Test]
         public void should_publish_executed_event_on_success()
         {
-            GivenCommandQueue();
             var commandA = new CommandA();
             var commandModel = new CommandModel
             {
@@ -156,7 +149,6 @@ namespace NzbDrone.Core.Test.Messaging.Commands
         [Test]
         public void should_use_completion_message()
         {
-            GivenCommandQueue();
             var commandA = new CommandA();
             var commandModel = new CommandModel
             {
@@ -175,7 +167,6 @@ namespace NzbDrone.Core.Test.Messaging.Commands
         [Test]
         public void should_use_last_progress_message_if_completion_message_is_null()
         {
-            GivenCommandQueue();
             var commandB = new CommandB();
 
             var commandModel = new CommandModel
