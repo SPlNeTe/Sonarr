@@ -100,7 +100,9 @@ namespace NzbDrone.Test.Common
 
             TempFolder = Path.Combine(TestContext.CurrentContext.TestDirectory, "_temp_" + UniqueNumber);
 
+            TestLogger.Trace("Creating Temp Folder: {0}", TempFolder);
             Directory.CreateDirectory(TempFolder);
+            TestLogger.Trace("Created Temp Folder: {0}", TempFolder);
         }
 
         [TearDown]
