@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.SQLite;
 using System.Linq;
 using System.Threading;
 using FluentAssertions;
@@ -144,6 +145,7 @@ namespace NzbDrone.Core.Test.Instrumentation
         [TearDown]
         public void Teardown()
         {
+            SQLiteConnection.ClearAllPools();
             Mocker.Resolve<DatabaseTarget>().UnRegister();
         }
 
