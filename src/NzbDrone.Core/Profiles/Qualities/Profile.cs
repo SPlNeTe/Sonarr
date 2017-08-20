@@ -25,12 +25,12 @@ namespace NzbDrone.Core.Profiles.Qualities
             return lastAllowed.Items.Last().Quality;
         }
 
-        public double GetIndex(Quality quality)
+        public QualityIndex GetIndex(Quality quality)
         {
             return GetIndex(quality.Id);
         }
 
-        public double GetIndex(int id)
+        public QualityIndex GetIndex(int id)
         {
             for (var i = 0; i < Items.Count; i++)
             {
@@ -40,13 +40,13 @@ namespace NzbDrone.Core.Profiles.Qualities
                 // Quality matches by ID
                 if (quality != null && quality.Id == id)
                 {
-                    return i;
+                    return new QualityIndex(i);
                 }
 
                 // Group matches by ID
                 if (item.Id > 0 && item.Id == id)
                 {
-                    return i;
+                    return new QualityIndex(i);
                 }
 
                 for (var g = 0; g < item.Items.Count; g++)
@@ -55,12 +55,12 @@ namespace NzbDrone.Core.Profiles.Qualities
 
                     if (groupItem.Quality.Id == id)
                     {
-                        return i + ((double)g / 10);
+                        return new QualityIndex(i, g);
                     }
                 }
             }
 
-            return 0;
+            return new QualityIndex();
         }
     }
 }

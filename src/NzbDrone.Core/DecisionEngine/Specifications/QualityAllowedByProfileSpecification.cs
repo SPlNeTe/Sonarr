@@ -23,7 +23,7 @@ namespace NzbDrone.Core.DecisionEngine.Specifications
 
             var profile = subject.Series.Profile.Value;
             var qualityIndex = profile.GetIndex(subject.ParsedEpisodeInfo.Quality.Quality);
-            var qualityOrGroup = profile.Items[(int) Math.Floor(qualityIndex)];
+            var qualityOrGroup = profile.Items[qualityIndex.Index];
 
             if (!qualityOrGroup.Allowed)
             {

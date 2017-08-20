@@ -38,7 +38,7 @@ namespace NzbDrone.Core.Tv
             foreach (var profile in profiles)
             {
                 var cutoffIndex = profile.GetIndex(profile.Cutoff);
-                var belowCutoff = profile.Items.Take((int)cutoffIndex).ToList();
+                var belowCutoff = profile.Items.Take(cutoffIndex.Index).ToList();
 
                 if (belowCutoff.Any())
                 {

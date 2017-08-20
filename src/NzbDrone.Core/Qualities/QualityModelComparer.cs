@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using NzbDrone.Common.EnsureThat;
 using NzbDrone.Core.Profiles.Qualities;
 
@@ -22,12 +21,7 @@ namespace NzbDrone.Core.Qualities
             var leftIndex = _profile.GetIndex(left);
             var rightIndex = _profile.GetIndex(right);
 
-            if (respectGroupOrder)
-            {
-                return leftIndex.CompareTo(rightIndex);
-            }
-
-            return Math.Floor(leftIndex).CompareTo(Math.Floor(rightIndex));
+            return leftIndex.CompareTo(rightIndex, respectGroupOrder);
         }
 
         public int Compare(Quality left, Quality right)
@@ -40,12 +34,7 @@ namespace NzbDrone.Core.Qualities
             var leftIndex = _profile.GetIndex(left);
             var rightIndex = _profile.GetIndex(right);
 
-            if (respectGroupOrder)
-            {
-                return leftIndex.CompareTo(rightIndex);
-            }
-
-            return Math.Floor(leftIndex).CompareTo(Math.Floor(rightIndex));
+            return leftIndex.CompareTo(rightIndex, respectGroupOrder);
         }
 
         public int Compare(QualityModel left, QualityModel right)

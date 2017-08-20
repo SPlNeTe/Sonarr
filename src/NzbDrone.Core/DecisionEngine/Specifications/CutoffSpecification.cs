@@ -41,7 +41,7 @@ namespace NzbDrone.Core.DecisionEngine.Specifications
                     _logger.Debug("Cutoff already met, rejecting.");
 
                     var qualityCutoffIndex = profile.GetIndex(profile.Cutoff);
-                    var qualityCutoff = profile.Items[(int)qualityCutoffIndex];
+                    var qualityCutoff = profile.Items[qualityCutoffIndex.Index];
 
                     return Decision.Reject("Existing file meets cutoff: {0} - {1}", qualityCutoff, subject.Series.LanguageProfile.Value.Cutoff);
                 }

@@ -946,6 +946,7 @@
     <Compile Include="Profiles\Qualities\ProfileQualityItem.cs" />
     <Compile Include="Profiles\Qualities\ProfileRepository.cs" />
     <Compile Include="Profiles\Qualities\ProfileService.cs" />
+    <Compile Include="Profiles\Qualities\QualityIndex.cs" />
     <Compile Include="ProgressMessaging\ProgressMessageContext.cs" />
     <Compile Include="Qualities\QualitySource.cs" />
     <Compile Include="Qualities\Revision.cs" />
