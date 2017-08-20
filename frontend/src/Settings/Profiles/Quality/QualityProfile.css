@@ -22,4 +22,5 @@
   composes: label from 'Components/Label.css';
 
   margin: 0;
+  border: none;
 }
