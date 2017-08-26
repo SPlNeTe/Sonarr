@@ -304,7 +304,7 @@ namespace NzbDrone.Core.Parser
                 try
                 {
                     result.Quality = MediaFileExtensions.GetQualityForExtension(Path.GetExtension(name));
-                    result.QualitySource = QualitySource.Extension;
+                    result.QualityDetectionSource = QualityDetectionSource.Extension;
                 }
                 catch (ArgumentException)
                 {

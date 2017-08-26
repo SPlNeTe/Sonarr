@@ -750,7 +750,12 @@
     <Compile Include="MediaFiles\Commands\BackendCommandAttribute.cs" />
     <Compile Include="MediaFiles\Commands\CleanUpRecycleBinCommand.cs" />
     <Compile Include="MediaFiles\Commands\DownloadedEpisodesScanCommand.cs" />
+    <Compile Include="MediaFiles\EpisodeImport\Augmenting\Augmenters\AugmentEpisodes.cs" />
+    <Compile Include="MediaFiles\EpisodeImport\Augmenting\Augmenters\AugmentQuality.cs" />
+    <Compile Include="MediaFiles\EpisodeImport\Augmenting\Augmenters\IAugmentLocalEpisode.cs" />
+    <Compile Include="MediaFiles\EpisodeImport\Augmenting\AugmentingService.cs" />
     <Compile Include="MediaFiles\EpisodeImport\DetectSampleResult.cs" />
+    <Compile Include="MediaFiles\EpisodeImport\Augmenting\AugmentingFailedException.cs" />
     <Compile Include="MediaFiles\EpisodeImport\ImportMode.cs" />
     <Compile Include="MediaFiles\Commands\RenameFilesCommand.cs" />
     <Compile Include="MediaFiles\Commands\RenameSeriesCommand.cs" />
@@ -935,6 +940,7 @@
     <Compile Include="Profiles\Delay\DelayProfileTagInUseValidator.cs" />
     <Compile Include="Profiles\ProfileRepository.cs" />
     <Compile Include="ProgressMessaging\ProgressMessageContext.cs" />
+    <Compile Include="Qualities\QualityDetectionSource.cs" />
     <Compile Include="Qualities\QualitySource.cs" />
     <Compile Include="Qualities\Revision.cs" />
     <Compile Include="RemotePathMappings\RemotePathMapping.cs" />

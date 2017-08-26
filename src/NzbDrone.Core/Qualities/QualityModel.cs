@@ -10,7 +10,36 @@ namespace NzbDrone.Core.Qualities
         public Revision Revision { get; set; }
 
         [JsonIgnore]
-        public QualitySource QualitySource { get; set; }
+        public QualityDetectionSource QualityDetectionSource { get; set; }
+
+        [JsonIgnore]
+        public QualitySource QualitySource
+        {
+            get
+            {
+                if (Quality == Quality.Bluray2160p || Quality == Quality.Bluray1080p || Quality == Quality.Bluray720p)
+                {
+                    return QualitySource.Bluray;
+                }
+
+                if (Quality == Quality.WEBDL2160p || Quality == Quality.WEBDL1080p || Quality == Quality.WEBDL720p || Quality == Quality.WEBDL480p)
+                {
+                    return QualitySource.Web;
+                }
+
+                if (Quality == Quality.DVD)
+                {
+                    return QualitySource.DVD;
+                }
+
+                if (Quality == Quality.RAWHD || Quality == Quality.HDTV2160p || Quality == Quality.HDTV1080p || Quality == Quality.HDTV720p || Quality == Quality.SDTV)
+                {
+                    return QualitySource.Television;
+                }
+
+                return QualitySource.Unknown;
+            }
+        }
         
         public QualityModel()
             : this(Quality.Unknown, new Revision())
